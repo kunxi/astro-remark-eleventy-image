@@ -100,12 +100,13 @@ const configureRemarkEleventyImagesPlugin = (config: Required<RemarkImagesConfig
                         // where the original image would be in the final build
                         if (node.url.startsWith('/')) {
                             originalImagePath = path.join(publicDir, node.url);
+                            outputImageDirHTML = path.dirname(node.url);
                         } else {
                             // Use relative path to the markdown file
                             originalImagePath = path.join(path.dirname(file.path), node.url);
+                            outputImageDirHTML = path.join(path.dirname(file.path), path.dirname(node.url));
                         }
                         outputImageDir = path.dirname(path.join(outDir, node.url));
-                        outputImageDirHTML = path.dirname(node.url);
 
                         tempConfig.filenameFormat = (id, src, width, format) =>
                         {
