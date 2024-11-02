@@ -25,9 +25,9 @@ const configureRemarkEleventyImagesPlugin = (config: Required<RemarkImagesConfig
 
         return (ast: any, file: any) => new Promise<void>(async (resolve) =>
         {
-            /* 
+            /*
                 According to some guidance, (https://www.huy.dev/2018-05-remark-gatsby-plugin-part-3/)
-                it's best to collect nodes to modify through the visitor function 
+                it's best to collect nodes to modify through the visitor function
                 and modify them asynchronously afterwards
             */
             // will be an array of valid image nodes (non remote)
@@ -36,7 +36,7 @@ const configureRemarkEleventyImagesPlugin = (config: Required<RemarkImagesConfig
             const visitor = (node: any) =>
             {
                 /*
-                    Remote images are off by default. 
+                    Remote images are off by default.
                     This is to prevent any stability issues, unnecessary errors, and longer processing times.
                     I'll add a portion in the README about turning it on
                 */
@@ -78,7 +78,7 @@ const configureRemarkEleventyImagesPlugin = (config: Required<RemarkImagesConfig
                 {
                     console.log(`(astro-remark-images) Optimizing image: ${path.basename(node.url)} referenced in file: ${path.basename(file.path)}`);
 
-                    if (Image.Util.isRemoteUrl(node.url)) 
+                    if (Image.Util.isRemoteUrl(node.url))
                     {
                         // Remote image. In this case the optimized images are put
                         // in a subdirectory of '/arei-optimg/' based on the markdown file name.
@@ -98,7 +98,12 @@ const configureRemarkEleventyImagesPlugin = (config: Required<RemarkImagesConfig
                     {
                         // Local Image. In this case the optimized images are put
                         // where the original image would be in the final build
-                        originalImagePath = path.join(publicDir, node.url);
+                        if (node.url.startsWith('/')) {
+                            originalImagePath = path.join(publicDir, node.url);
+                        } else {
+                            // Use relative path to the markdown file
+                            originalImagePath = path.join(path.dirname(file.path), node.url);
+                        }
                         outputImageDir = path.dirname(path.join(outDir, node.url));
                         outputImageDirHTML = path.dirname(node.url);
 
