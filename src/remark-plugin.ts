@@ -16,10 +16,11 @@ import { RemarkImagesConfig } from "./types.js";
 
 // Closures are so neat.
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
-const configureRemarkEleventyImagesPlugin = (config: Required<RemarkImagesConfig> & { publicDir: string, outDir: string; }) =>
+const configureRemarkEleventyImagesPlugin = (config: Required<RemarkImagesConfig> & { publicDir: string, outDir: string, srcDir: string; }) =>
 {
     return function remarkEleventyImages()
     {
+        const srcDir = config.srcDir.replace(/\/$/, "");  // stripe the trailing slash
         const publicDir = config.publicDir;
         const outDir = config.outDir;
 
@@ -98,14 +99,22 @@ const configureRemarkEleventyImagesPlugin = (config: Required<RemarkImagesConfig
                     {
                         // Local Image. In this case the optimized images are put
                         // where the original image would be in the final build
-                        outputImageDir = path.dirname(path.join(outDir, node.url));
                         if (node.url.startsWith('/')) {
                             originalImagePath = path.join(publicDir, node.url);
+                            outputImageDir = path.dirname(path.join(outDir, node.url));
+                            outputImageDirHTML = path.dirname(node.url);
                         } else {
                             // Use relative path to the markdown file
                             originalImagePath = path.join(path.dirname(file.path), node.url);
+
+                            // Assume the originalImagePath is src/content/blog/2012/03/foo.jpg.
+                            // The original image path is honored, thus
+                            //  - outputImageDir = publicDir/blog/2012/03/
+                            //  - outputImageDirHTML = /blog/2012/03
+                            const outputImagePath = originalImagePath.slice(srcDir.length).replace(/^\/(content|pages)/, "");
+                            outputImageDir = path.dirname(path.join(outDir, outputImagePath))
+                            outputImageDirHTML = path.dirname(outputImagePath);
                         }
-                        outputImageDirHTML = path.dirname(node.url);
 
                         tempConfig.filenameFormat = (id, src, width, format) =>
                         {
