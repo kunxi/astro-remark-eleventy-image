@@ -18,7 +18,8 @@ export default function remarkEleventyImages(options: Partial<RemarkImagesConfig
                 if (command == 'build')
                 {
                     // Setup Default Plugin Settings
-                    const defaults: RemarkImagesConfig & { publicDir: string, outDir: string; } = {
+                    const defaults: RemarkImagesConfig & { publicDir: string, outDir: string, srcDir: string;} = {
+                        srcDir: fileURLToPath(config.srcDir),
                         publicDir: fileURLToPath(config.publicDir),
                         outDir: fileURLToPath(config.outDir),
                         sizes: "(max-width: 700px) 100vw, 700px",
